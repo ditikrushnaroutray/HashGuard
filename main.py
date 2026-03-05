@@ -2,48 +2,53 @@ import hashlib
 import requests
 import math
 import re
+import random
+import string
 
 def check_pwned_api(password):
-    # Hash the password and get the first 5 chars
     sha1_pw = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
     prefix, suffix = sha1_pw[:5], sha1_pw[5:]
-    
-    # Query HIBP API
     url = f"https://api.pwnedpasswords.com/range/{prefix}"
-    res = requests.get(url)
-    
-    if res.status_code != 200:
-        return "Error checking breach database."
-    
-    # Check if suffix is in the results
-    hashes = (line.split(':') for line in res.text.splitlines())
-    for h, count in hashes:
-        if h == suffix:
-            return f"VULNERABLE! This password appeared in {count} data breaches."
-    return "Secure: Not found in known data leaks."
+    try:
+        res = requests.get(url)
+        if res.status_code != 200: return "API Error"
+        hashes = (line.split(':') for line in res.text.splitlines())
+        for h, count in hashes:
+            if h == suffix:
+                return f"VULNERABLE! Found in {count} leaks."
+        return "SECURE: No leaks found."
+    except:
+        return "Connection Error"
 
 def estimate_crack_time(password):
-    # Basic entropy calculation
-    charset_size = 0
-    if re.search(r'[a-z]', password): charset_size += 26
-    if re.search(r'[A-Z]', password): charset_size += 26
-    if re.search(r'[0-9]', password): charset_size += 10
-    if re.search(r'[^a-zA-Z0-9]', password): charset_size += 32
+    charset = 0
+    if re.search(r'[a-z]', password): charset += 26
+    if re.search(r'[A-Z]', password): charset += 26
+    if re.search(r'[0-9]', password): charset += 10
+    if re.search(r'[^a-zA-Z0-9]', password): charset += 32
+    if charset == 0 or len(password) == 0: return "Instant"
     
-    if charset_size == 0: return "Instant"
-    
-    combinations = charset_size ** len(password)
-    # Assuming a modern 2026 rig doing 100 billion guesses/sec
-    seconds = combinations / 100_000_000_000
+    combinations = charset ** len(password)
+    seconds = combinations / 100_000_000_000 # 100 Billion guesses/sec
     
     if seconds < 1: return "Instant"
-    if seconds < 3600: return f"{int(seconds/60)} minutes"
-    if seconds < 86400: return f"{int(seconds/3600)} hours"
+    if seconds < 86400: return "Less than a day"
     if seconds < 31536000: return f"{int(seconds/86400)} days"
-    return f"{int(seconds/31536000)} years"
+    return f"{int(seconds/31536000):,} years"
 
-# --- Main Execution ---
-user_pw = input("Enter password to test: ")
-print(f"\n--- Security Report ---")
-print(f"Breach Status: {check_pwned_api(user_pw)}")
-print(f"Est. Crack Time: {estimate_crack_time(user_pw)}")
+def recommend_strong_password(old_password):
+    # Start with their password, swap letters for symbols
+    replacements = {'a': '@', 's': '$', 'i': '!', 'o': '0', 'e': '3'}
+    new_pw = "".join(replacements.get(c.lower(), c) for c in old_password)
+    # Add random characters to ensure it's at least 14 chars long
+    while len(new_pw) < 14:
+        new_pw += random.choice(string.ascii_letters + string.digits + "!@#$%^&*")
+    return new_pw
+
+# --- RUN THE PROGRAM ---
+print("--- HASHGUARD TERMINAL ---")
+user_pw = input("Enter a password to test: ")
+
+print(f"\n[!] Breach Status: {check_pwned_api(user_pw)}")
+print(f"[!] Est. Crack Time: {estimate_crack_time(user_pw)}")
+print(f"[!] Recommendation: {recommend_strong_password(user_pw)}")
