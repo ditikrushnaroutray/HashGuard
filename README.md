@@ -1,8 +1,9 @@
  # 🛡️ HashGuard Sentinel
-
 ![Build Status](https://img.shields.io/badge/Build-Passing-4ade80?style=for-the-badge)
 ![Security](https://img.shields.io/badge/Security-Verified-blueviolet?style=for-the-badge)
-![GitHub stars](https://img.shields.io/github/stars/ditikrushnaroutray/HashGuard?style=for-the-badge&color=38bdf8)
+![Stars](https://img.shields.io/github/stars/ditikrushnaroutray/HashGuard?style=for-the-badge&color=38bdf8)
+![Forks](https://img.shields.io/github/forks/ditikrushnaroutray/HashGuard?style=for-the-badge&color=7dd3fc)
+![License](https://img.shields.io/github/license/ditikrushnaroutray/HashGuard?style=for-the-badge&color=4ade80)
 
 ---
 
