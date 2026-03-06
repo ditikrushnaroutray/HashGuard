@@ -10,13 +10,7 @@
 ## 📖 Project Overview
 **HashGuard** is a security intelligence utility developed to bridge the gap between user convenience and robust data protection. This project explores the intersection of **Network Security** and **Data Privacy**.
 
-**HashGuard** is a security intelligence utility developed to bridge the gap between user convenience and robust data protection. This project explores the intersection of **Network Security** and **Data Privacy**.
-
 Unlike standard checkers, HashGuard prioritizes user anonymity by implementing a **local hashing protocol**, ensuring that sensitive plain-text data never leaves the client's environment.
-
-# 🛡️ HashGuard: Password Intelligence & Security Tool
-
-**HashGuard** is a privacy-first cybersecurity utility designed to evaluate password strength using real-world data breach intelligence and entropy-based crack-time estimation.
 
 ## 🚀 Features
 - **Breach Intelligence:** Uses the **Have I Been Pwned (HIBP) API** with *k-Anonymity* to check if your password has been leaked in known data breaches without ever sending your plain-text password over the internet.
