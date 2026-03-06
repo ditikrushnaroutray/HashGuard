@@ -1,4 +1,15 @@
+# 🛡️ HashGuard Sentinel
+
+![Build Status](https://img.shields.io/badge/Build-Passing-4ade80?style=for-the-badge)
+![Security](https://img.shields.io/badge/Security-Verified-blueviolet?style=for-the-badge)
+![GitHub stars](https://img.shields.io/github/stars/ditikrushnaroutray/HashGuard?style=for-the-badge&color=38bdf8)
+
 ## 📖 Project Overview
+HashGuard is a security intelligence utility developed to bridge the gap between user convenience and robust data protection. This project explores the intersection of Network Security and Data Privacy.
+
+Unlike standard checkers, HashGuard prioritizes user anonymity by implementing a local hashing protocol, ensuring that sensitive plain-text data never leaves the client's environment.
+
+**HashGuard** is a security intelligence utility developed to bridge the gap between user convenience and robust data protection. Built during my **MCA preparation**, this project explores the intersection of **Network Security** and **Data Privacy**.
 **HashGuard** is a security intelligence utility developed to bridge the gap between user convenience and robust data protection. This project explores the intersection of **Network Security** and **Data Privacy**. 
 
 Unlike standard checkers, HashGuard prioritizes user anonymity by implementing a **local hashing protocol**, ensuring that sensitive plain-text data never leaves the client's environment.
