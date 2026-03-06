@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "HashGuard Sentinel",
+  "version": "1.0",
+  "description": "Check password breaches and strengthen security.",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": []
+}

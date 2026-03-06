@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { width: 300px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 15px; background: #0f172a; color: #f8fafc; }
+    h3 { color: #38bdf8; margin-top: 0; }
+    input { width: 100%; padding: 10px; box-sizing: border-box; background: #1e293b; border: 1px solid #334155; color: white; border-radius: 6px; margin-bottom: 10px; }
+    button { width: 100%; padding: 10px; background: #38bdf8; color: #0f172a; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    button:hover { background: #7dd3fc; }
+    #result { margin-top: 15px; font-size: 13px; line-height: 1.4; }
+    .status-bad { color: #f87171; font-weight: bold; }
+    .status-good { color: #4ade80; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h3>🛡️ HashGuard</h3>
+  <input type="password" id="passwordInput" placeholder="Enter password to test...">
+  <button id="checkBtn">Analyze Security</button>
+  <div id="result"></div>
+  <script src="popup.js"></script>
+</body>
+</html>
