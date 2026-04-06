@@ -34,3 +34,4 @@ Unlike standard checkers, HashGuard prioritizes user anonymity by implementing a
 1. Clone the repository:
    ```bash
    git clone [https://github.com/ditikrushnaroutray/HashGuard.git](https://github.com/ditikrushnaroutray/HashGuard.git)
+   
