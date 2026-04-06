@@ -4,6 +4,7 @@ import math
 import re
 import random
 import string
+import getpass
 
 def check_pwned_api(password):
     sha1_pw = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
@@ -47,8 +48,19 @@ def recommend_strong_password(old_password):
 
 # --- RUN THE PROGRAM ---
 print("--- HASHGUARD TERMINAL ---")
-user_pw = input("Enter a password to test: ")
 
-print(f"\n[!] Breach Status: {check_pwned_api(user_pw)}")
+# Use getpass to hide the user's password as they type it
+user_pw = getpass.getpass("Enter a password to test (input hidden): ")
+
+# Check the API and save the status
+breach_status = check_pwned_api(user_pw)
+
+print(f"\n[!] Breach Status: {breach_status}")
 print(f"[!] Est. Crack Time: {estimate_crack_time(user_pw)}")
-print(f"[!] Recommendation: {recommend_strong_password(user_pw)}")
+
+# Only recommend a strong password if the current one was found in a leak
+if "VULNERABLE" in breach_status:
+    print(f"[!] Recommendation: {recommend_strong_password(user_pw)}")
+else:
+    print("[!] Recommendation: No leaks found. Your password is secure!")
+    
