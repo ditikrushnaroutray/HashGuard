@@ -2,9 +2,15 @@
   "manifest_version": 3,
   "name": "HashGuard Sentinel",
   "version": "1.0",
-  "description": "Check password breaches and strengthen security.",
+  "description": "Securely evaluate password strength and check data breaches using k-Anonymity.",
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_title": "Open HashGuard"
   },
-  "permissions": []
+  "permissions": [
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://api.pwnedpasswords.com/*"
+  ]
 }
