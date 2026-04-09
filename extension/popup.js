@@ -1,23 +1,29 @@
-// 1. Calculate Crack Time (Translated from Python)
+// 1. Calculate Crack Time (Upgraded with zxcvbn)
 function estimateCrackTime(password) {
-    let charset = 0;
-    if (/[a-z]/.test(password)) charset += 26;
-    if (/[A-Z]/.test(password)) charset += 26;
-    if (/[0-9]/.test(password)) charset += 10;
-    if (/[^a-zA-Z0-9]/.test(password)) charset += 32;
+    if (!password) return "Instant";
     
-    if (charset === 0 || password.length === 0) return "Instant";
+    // zxcvbn does all the hardcore math, dictionary checks, and pattern recognition!
+    const evaluation = zxcvbn(password);
     
-    const combinations = Math.pow(charset, password.length);
-    const seconds = combinations / 100000000000; // 100 Billion guesses/sec
+    // The library returns a human-readable string like "less than a second" or "centuries"
+    let timeString = evaluation.crack_times_display.offline_fast_hashing_1e10_per_second;
     
-    if (seconds < 1) return "Instant";
-    if (seconds < 86400) return "Less than a day";
-    if (seconds < 31536000) return `${Math.floor(seconds/86400)} days`;
-    return `${Math.floor(seconds/31536000).toLocaleString()} years`;
+    // Let's add color-coding based on the score (0 is worst, 4 is best)
+    let color = "#ff003c"; // Red
+    if (evaluation.score === 2) color = "#fbbf24"; // Yellow
+    if (evaluation.score === 3) color = "#4ade80"; // Green
+    if (evaluation.score === 4) color = "#0ea5e9"; // Blue/Cyan (Uncrackable)
+    
+    // If the score is bad, zxcvbn even tells us WHY! (e.g., "This is a common password")
+    let warning = "";
+    if (evaluation.feedback.warning) {
+        warning = `<br><span style="color:#fbbf24; font-size:11px;">⚠️ ${evaluation.feedback.warning}</span>`;
+    }
+    
+    return `<span style="color: ${color}; font-weight: bold;">${timeString}</span>${warning}`;
 }
 
-// 2. Recommend Password Logic (Translated from Python)
+// 2. Recommend Password Logic
 function recommendStrongPassword(oldPassword) {
     const replacements = {'a': '@', 's': '$', 'i': '!', 'o': '0', 'e': '3'};
     let newPw = oldPassword.split('').map(c => replacements[c.toLowerCase()] || c).join('');
@@ -29,7 +35,7 @@ function recommendStrongPassword(oldPassword) {
     return newPw;
 }
 
-// NEW: Generator Function
+// 3. Generator Function
 function generateRandomPassword(length = 16) {
     const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*-_=+";
     let password = "";
@@ -41,7 +47,7 @@ function generateRandomPassword(length = 16) {
 
 // --- EVENT LISTENERS ---
 
-// NEW: Show/Hide Password Toggle
+// Show/Hide Password Toggle
 document.getElementById('togglePassword').addEventListener('click', function() {
     const pwdInput = document.getElementById('passwordInput');
     if (pwdInput.type === 'password') {
@@ -53,7 +59,7 @@ document.getElementById('togglePassword').addEventListener('click', function() {
     }
 });
 
-// NEW: Generate Button Click
+// Generate Button Click
 document.getElementById('generateBtn').addEventListener('click', () => {
     const newPassword = generateRandomPassword(16);
     const pwdInput = document.getElementById('passwordInput');
@@ -65,7 +71,7 @@ document.getElementById('generateBtn').addEventListener('click', () => {
     document.getElementById('checkBtn').click();
 });
 
-// 3. Main Event Listener (Check Status)
+// Main Event Listener (Check Status)
 document.getElementById('checkBtn').addEventListener('click', async () => {
     const password = document.getElementById('passwordInput').value;
     const resultBox = document.getElementById('resultBox');
@@ -108,14 +114,14 @@ document.getElementById('checkBtn').addEventListener('click', async () => {
         if (foundCount > 0) {
             breachStatus.innerHTML = `Breach Status: <span class="vulnerable">VULNERABLE! Found in ${foundCount} leaks.</span>`;
             // Only recommend if breached
-            recommendation.innerHTML = `Recommendation: Try <strong>${recommendStrongPassword(password)}</strong>`;
+            recommendation.innerHTML = `Recommendation: Try <strong style="color: #fff;">${recommendStrongPassword(password)}</strong>`;
         } else {
             breachStatus.innerHTML = `Breach Status: <span class="secure">SECURE! No leaks found.</span>`;
             recommendation.innerHTML = `Recommendation: No leaks found. Your password is secure!`;
         }
 
-        // Update UI: Crack Time
-        crackTime.innerHTML = `Est. Crack Time: <strong>${estimateCrackTime(password)}</strong>`;
+        // Update UI: Crack Time (Using zxcvbn!)
+        crackTime.innerHTML = `Est. Crack Time: ${estimateCrackTime(password)}`;
 
     } catch (error) {
         breachStatus.innerHTML = "Error connecting to API.";
