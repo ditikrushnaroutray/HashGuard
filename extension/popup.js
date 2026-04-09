@@ -29,7 +29,43 @@ function recommendStrongPassword(oldPassword) {
     return newPw;
 }
 
-// 3. Main Event Listener
+// NEW: Generator Function
+function generateRandomPassword(length = 16) {
+    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*-_=+";
+    let password = "";
+    for (let i = 0; i < length; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+}
+
+// --- EVENT LISTENERS ---
+
+// NEW: Show/Hide Password Toggle
+document.getElementById('togglePassword').addEventListener('click', function() {
+    const pwdInput = document.getElementById('passwordInput');
+    if (pwdInput.type === 'password') {
+        pwdInput.type = 'text';
+        this.textContent = '🔒'; // Change icon to lock
+    } else {
+        pwdInput.type = 'password';
+        this.textContent = '👁️'; // Change icon to eye
+    }
+});
+
+// NEW: Generate Button Click
+document.getElementById('generateBtn').addEventListener('click', () => {
+    const newPassword = generateRandomPassword(16);
+    const pwdInput = document.getElementById('passwordInput');
+    pwdInput.value = newPassword;
+    pwdInput.type = 'text'; // Briefly show the generated password
+    document.getElementById('togglePassword').textContent = '🔒';
+    
+    // Automatically trigger the check!
+    document.getElementById('checkBtn').click();
+});
+
+// 3. Main Event Listener (Check Status)
 document.getElementById('checkBtn').addEventListener('click', async () => {
     const password = document.getElementById('passwordInput').value;
     const resultBox = document.getElementById('resultBox');
