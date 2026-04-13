@@ -18,3 +18,8 @@ thumbs.db
 # IDE specific files
 .vscode/
 .idea/
+# JetBrains IDEs
+*.iml
+*.iws
+*.ipr                       
+code_1.115.0-1775600353_amd64.deb

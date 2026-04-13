@@ -29,7 +29,7 @@ Unlike standard checkers, HashGuard prioritizes user anonymity by implementing a
   - Translating Python logic to JavaScript.
   - Creating a Chrome/Brave Manifest V3 extension.
   - Building a clean, dark-themed UI for real-time password checking while browsing.
-
+ 
 ## ⚙️ How to Run (Terminal Version)
 1. Clone the repository:
    ```bash
