@@ -64,3 +64,4 @@ if "VULNERABLE" in breach_status:
 else:
     print("[!] Recommendation: No leaks found. Your password is secure!")
     
+    
