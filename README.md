@@ -35,4 +35,3 @@ Unlike standard checkers, HashGuard prioritizes user anonymity by implementing a
    ```bash
    git clone [https://github.com/ditikrushnaroutray/HashGuard.git](https://github.com/ditikrushnaroutray/HashGuard.git)
 
-
