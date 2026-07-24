@@ -5,10 +5,15 @@
   "description": "Securely evaluate password strength and check data breaches using k-Anonymity.",
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Open HashGuard"
+    "default_title": "HashGuard Sentinel"
+  },
+  "background": {
+    "service_worker": "background.js"
   },
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "contextMenus",
+    "storage"
   ],
   "host_permissions": [
     "https://api.pwnedpasswords.com/*"
