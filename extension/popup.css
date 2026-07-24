@@ -1,0 +1,235 @@
+/* HashGuard Sentinel - Cyber/Neon Theme CSS */
+:root {
+  --bg-gradient: linear-gradient(135deg, #090b14, #12182b);
+  --primary-cyan: #38bdf8;
+  --primary-cyan-hover: #7dd3fc;
+  --accent-purple: #a855f7;
+  --accent-purple-hover: #c084fc;
+  --card-bg: rgba(15, 23, 42, 0.85);
+  --border-color: rgba(56, 189, 248, 0.3);
+  --text-main: #e0f2fe;
+  --text-muted: #94a3b8;
+  --danger-red: #ff003c;
+  --success-green: #00ff88;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  width: 350px;
+  min-height: 420px;
+  padding: 18px;
+  font-family: 'Consolas', 'Courier New', monospace, sans-serif;
+  background: var(--bg-gradient);
+  color: var(--text-main);
+  margin: 0;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 20px;
+  color: var(--primary-cyan);
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  text-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+}
+
+.header .tagline {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.input-container {
+  position: relative;
+  margin-bottom: 14px;
+  width: 100%;
+}
+
+input[type="password"],
+input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  padding-right: 42px;
+  border: 1px solid var(--primary-cyan);
+  border-radius: 6px;
+  background-color: var(--card-bg);
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  box-shadow: inset 0 0 8px rgba(56, 189, 248, 0.2);
+  transition: all 0.25s ease;
+}
+
+input:focus {
+  border-color: var(--primary-cyan-hover);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.6), inset 0 0 8px rgba(56, 189, 248, 0.3);
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--primary-cyan);
+  opacity: 0.8;
+  user-select: none;
+  font-size: 16px;
+  transition: opacity 0.2s, text-shadow 0.2s;
+}
+
+.toggle-password:hover {
+  opacity: 1;
+  text-shadow: 0 0 8px var(--primary-cyan);
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 10px 14px;
+  background-color: transparent;
+  border-radius: 6px;
+  font-family: inherit;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+#checkBtn {
+  color: var(--primary-cyan);
+  border: 1px solid var(--primary-cyan);
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.25);
+}
+
+#checkBtn:hover:not(:disabled) {
+  background-color: var(--primary-cyan);
+  color: #090b14;
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.8);
+}
+
+#generateBtn {
+  color: var(--accent-purple);
+  border: 1px solid var(--accent-purple);
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.25);
+}
+
+#generateBtn:hover:not(:disabled) {
+  background-color: var(--accent-purple);
+  color: #fff;
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.8);
+}
+
+.result-box {
+  padding: 14px;
+  background-color: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  font-size: 12px;
+  display: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  transition: box-shadow 0.3s ease;
+}
+
+/* Pulsing Animation for Loading State */
+@keyframes pulseGlow {
+  0% { opacity: 0.65; box-shadow: 0 0 4px rgba(56, 189, 248, 0.3); }
+  50% { opacity: 1; box-shadow: 0 0 16px rgba(56, 189, 248, 0.8); }
+  100% { opacity: 0.65; box-shadow: 0 0 4px rgba(56, 189, 248, 0.3); }
+}
+
+.loading-pulse {
+  animation: pulseGlow 1.2s infinite ease-in-out;
+}
+
+.result-row {
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.result-row:last-child {
+  margin-bottom: 0;
+}
+
+.vulnerable {
+  color: var(--danger-red);
+  text-shadow: 0 0 8px rgba(255, 0, 60, 0.6);
+  font-weight: bold;
+}
+
+.secure {
+  color: var(--success-green);
+  text-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
+  font-weight: bold;
+}
+
+/* Strength Meter Progress Bar */
+.meter-label-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.meter-track {
+  width: 100%;
+  height: 8px;
+  background-color: #1e293b;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.meter-fill {
+  height: 100%;
+  width: 0%;
+  transition: width 0.35s ease, background-color 0.35s ease;
+}
+
+.score-0 { width: 20%; background-color: #ff003c; box-shadow: 0 0 8px #ff003c; }
+.score-1 { width: 40%; background-color: #f97316; box-shadow: 0 0 8px #f97316; }
+.score-2 { width: 60%; background-color: #eab308; box-shadow: 0 0 8px #eab308; }
+.score-3 { width: 80%; background-color: #22c55e; box-shadow: 0 0 8px #22c55e; }
+.score-4 { width: 100%; background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8; }
+
+.warning-banner {
+  margin-top: 8px;
+  padding: 8px;
+  background-color: rgba(251, 191, 36, 0.1);
+  border-left: 3px solid #fbbf24;
+  color: #fbbf24;
+  font-size: 11px;
+  border-radius: 2px;
+}
+
+.recommendation-box {
+  margin-top: 10px;
+  color: var(--accent-purple);
+  border-top: 1px dashed rgba(168, 85, 247, 0.3);
+  padding-top: 8px;
+  word-break: break-all;
+}

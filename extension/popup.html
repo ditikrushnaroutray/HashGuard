@@ -3,141 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HashGuard</title>
-  <style>
-    body {
-      width: 340px;
-      padding: 20px;
-      font-family: 'Consolas', 'Courier New', monospace;
-      background: linear-gradient(135deg, #090b14, #12182b);
-      color: #e0f2fe;
-      margin: 0;
-    }
-    h2 {
-      margin-top: 0;
-      font-size: 22px;
-      color: #38bdf8;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      text-align: center;
-      border-bottom: 1px solid rgba(56, 189, 248, 0.3);
-      padding-bottom: 12px;
-      text-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
-    }
-    .input-container {
-      position: relative;
-      margin-bottom: 15px;
-      width: 100%;
-    }
-    input[type="password"], input[type="text"] {
-      width: 100%;
-      padding: 12px;
-      padding-right: 40px;
-      border: 1px solid #38bdf8;
-      border-radius: 4px;
-      background-color: rgba(15, 23, 42, 0.8);
-      color: #fff;
-      box-sizing: border-box;
-      font-family: 'Consolas', 'Courier New', monospace;
-      outline: none;
-      box-shadow: inset 0 0 8px rgba(56, 189, 248, 0.2);
-      transition: all 0.3s ease;
-    }
-    input:focus {
-      border-color: #7dd3fc;
-      box-shadow: 0 0 12px rgba(56, 189, 248, 0.6), inset 0 0 8px rgba(56, 189, 248, 0.4);
-    }
-    .toggle-password {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      cursor: pointer;
-      color: #38bdf8;
-      opacity: 0.7;
-      transition: opacity 0.2s;
-    }
-    .toggle-password:hover { opacity: 1; text-shadow: 0 0 5px #38bdf8; }
-    
-    .button-group {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-    button {
-      flex: 1;
-      padding: 10px;
-      background-color: transparent;
-      color: #38bdf8;
-      border: 1px solid #38bdf8;
-      border-radius: 4px;
-      font-family: 'Consolas', 'Courier New', monospace;
-      font-weight: bold;
-      text-transform: uppercase;
-      font-size: 12px;
-      letter-spacing: 1px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 8px rgba(56, 189, 248, 0.2);
-    }
-    button:hover {
-      background-color: #38bdf8;
-      color: #090b14;
-      box-shadow: 0 0 15px rgba(56, 189, 248, 0.8);
-    }
-    #generateBtn {
-      border-color: #a855f7;
-      color: #a855f7;
-      box-shadow: 0 0 8px rgba(168, 85, 247, 0.2);
-    }
-    #generateBtn:hover {
-      background-color: #a855f7;
-      color: #fff;
-      box-shadow: 0 0 15px rgba(168, 85, 247, 0.8);
-    }
-    .result-box {
-      padding: 15px;
-      background-color: rgba(15, 23, 42, 0.6);
-      border: 1px solid #1e293b;
-      border-radius: 4px;
-      font-size: 13px;
-      display: none;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.5);
-    }
-    .status { margin-bottom: 10px; line-height: 1.5; }
-    .vulnerable { color: #ff003c; text-shadow: 0 0 8px rgba(255, 0, 60, 0.6); font-weight: bold; }
-    .secure { color: #00ff88; text-shadow: 0 0 8px rgba(0, 255, 136, 0.6); font-weight: bold; }
-    #recommendation { 
-      margin-top: 12px; 
-      color: #a855f7; 
-      text-shadow: 0 0 8px rgba(168, 85, 247, 0.6); 
-      border-top: 1px dashed rgba(168, 85, 247, 0.3);
-      padding-top: 10px;
-    }
-  </style>
+  <title>HashGuard Sentinel</title>
+  <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <h2>[ 🛡️ HashGuard ]</h2>
-  
+  <div class="header">
+    <h2>🛡️ HashGuard</h2>
+    <div class="tagline">Zero-Knowledge Breach & Entropy Sentinel</div>
+  </div>
+
   <div class="input-container">
-    <input type="password" id="passwordInput" placeholder="Enter password...">
-    <span class="toggle-password" id="togglePassword" title="Show/Hide">👁️</span>
+    <input type="password" id="passwordInput" placeholder="Enter or paste password..." autocomplete="off">
+    <span class="toggle-password" id="togglePassword" title="Show/Hide Password">👁️</span>
   </div>
 
   <div class="button-group">
-    <button id="checkBtn">Check Status</button>
-    <button id="generateBtn">Generate ⚡</button>
+    <button id="checkBtn">Check Password</button>
+    <button id="generateBtn">Generate Secure 16-Char ⚡</button>
   </div>
 
   <div id="resultBox" class="result-box">
-    <div id="breachStatus" class="status"></div>
-    <div id="crackTime" class="status"></div>
-    <div id="recommendation" class="status"></div>
+    <!-- Breach Status Result -->
+    <div id="breachStatus" class="result-row"></div>
+
+    <!-- Visual Strength Meter -->
+    <div class="result-row" id="strengthContainer" style="margin-top: 10px;">
+      <div class="meter-label-container">
+        <span><strong>Strength:</strong></span>
+        <span id="strengthLabel" style="font-weight: bold;">-</span>
+      </div>
+      <div class="meter-track">
+        <div id="meterFill" class="meter-fill"></div>
+      </div>
+    </div>
+
+    <!-- Crack Time Display -->
+    <div id="crackTime" class="result-row"></div>
+
+    <!-- Warning / Feedback Banner -->
+    <div id="warningBanner" class="warning-banner" style="display: none;"></div>
+
+    <!-- Recommendation Box -->
+    <div id="recommendation" class="recommendation-box" style="display: none;"></div>
   </div>
 
-  <!-- LOAD ZXCVBN FIRST! -->
-  <script src="zxcvbn.js"></script>
-  <!-- THEN YOUR SCRIPT -->
+  <!-- Load bundled local zxcvbn library first for zero-knowledge compliance -->
+  <script src="libs/zxcvbn.js"></script>
+  <!-- Load popup script -->
   <script src="popup.js"></script>
 </body>
 </html>
