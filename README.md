@@ -33,31 +33,17 @@ HashGuard Sentinel is engineered under strict **Zero-Knowledge** principles:
 
 ## ✨ Features
 
-### 🧩 1. Browser Extension (Chrome, Brave, Edge)
-- **Corporate Dark Aesthetic:** Designed with "The Security Suite" Design System (Option A)—flat, high-contrast, professional matte dark layout.
+### 🧩 Browser Extension (Chrome, Brave, Edge)
+- **Modern Dark UI:** Flat, high-contrast, professional dark layout.
 - **Intelligent Password Mutator ("✨ Suggest Safer Version"):** Transforms weak or breached passwords into 12+ character high-entropy variants that retain ~90% of the original character structure for memorability.
-- **Cryptographic Generator:** Built-in 16-character generator powered by `crypto.getRandomValues` and Fisher-Yates shuffle algorithms.
+- **Cryptographic Generator:** Built-in 16-character password generator powered by `crypto.getRandomValues` and Fisher-Yates shuffle algorithms.
 - **Context Menu Integration:** Right-click selected password fields to inspect credentials via HashGuard with automated single-use memory cleanup.
 
-### 💻 2. Enterprise Python CLI Tool (`main.py`)
+### 💻 Enterprise Python CLI Tool (`main.py`)
 - **Persistent Interactive Session:** Run `python main.py` for a continuous interactive auditing terminal with instant feedback, recommendations, and graceful exit handling.
 - **Enterprise Bulk Audit Mode (`--bulk`):** Audit hundreds of credentials at scale from text files with built-in prefix caching and `tqdm` progress tracking.
 - **Rate Limit & Retry Protection:** Respects HIBP rate limits (1.5-second inter-request delay on cache miss) and exponential backoff retries (1s, 2s, 4s).
 - **Report Export (`--export`):** Save structured audit reports to JSON (`.json`) or CSV (`.csv`) with automatic security warning prompts.
-
----
-
-## 📸 Screenshots
-
-*(Place screenshots inside the `/screenshots` directory)*
-
-| Extension Popup (Option A Dark Theme) | Breach Detection & Warning |
-| :---: | :---: |
-| ![Extension Main View](screenshots/extension_popup.png) | ![Breach Warning View](screenshots/extension_breach.png) |
-
-| Intelligent Password Mutator | Python CLI Bulk Audit |
-| :---: | :---: |
-| ![Password Mutator View](screenshots/extension_mutator.png) | ![CLI Bulk Audit View](screenshots/cli_bulk.png) |
 
 ---
 
@@ -133,12 +119,11 @@ HashGuard/
 ├── extension/                   # Manifest V3 Browser Extension
 │   ├── manifest.json            # Extension configuration & service worker registration
 │   ├── popup.html               # Main extension popup interface
-│   ├── popup.css                # "The Security Suite" Design System (Option A)
+│   ├── popup.css                # Extension dark theme stylesheet
 │   ├── popup.js                 # Local hashing, HIBP lookup, zxcvbn integration & mutator
 │   ├── background.js            # Service worker & context menu event listener
 │   └── libs/
 │       └── zxcvbn.js            # Bundled local zero-knowledge entropy library
-├── screenshots/                 # Screenshots for documentation
 ├── main.py                      # Python CLI (Interactive & Bulk Audit tool)
 ├── requirements.txt             # CLI Python dependencies
 ├── test_passwords.txt           # Test sample file for bulk auditing
