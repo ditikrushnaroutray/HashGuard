@@ -19,7 +19,18 @@
 
   <div class="button-group">
     <button id="checkBtn">Check Password</button>
+    <button id="mutateBtn" class="mutate-btn">✨ Suggest Safer Version</button>
     <button id="generateBtn">Generate Secure 16-Char ⚡</button>
+  </div>
+
+  <!-- Intelligent Mutator Output Area -->
+  <div id="mutatedOutput" class="mutated-box" style="display: none;">
+    <div class="mutated-header">
+      <span class="mutated-title">Suggested Safer Version</span>
+      <button id="copyMutatedBtn" class="copy-btn">Copy</button>
+    </div>
+    <div id="mutatedText" class="mutated-text"></div>
+    <div id="mutatedNote" class="mutated-note" style="display: none;"></div>
   </div>
 
   <div id="resultBox" class="result-box">

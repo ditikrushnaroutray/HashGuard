@@ -6,14 +6,21 @@
  * 3. Loading state / spinner & rate-limiting protection
  * 4. Local zxcvbn entropy evaluation (score, visual progress bar, crack time display)
  * 5. Cryptographically secure 16-character password generator (crypto.getRandomValues)
- * 6. Context menu auto-fill with storage.onChanged listener & immediate cleanup
+ * 6. Intelligent Password Mutator (100% local leetspeak + length padding + entropy boost)
+ * 7. Context menu auto-fill with storage.onChanged listener & immediate cleanup
  */
 
 document.addEventListener('DOMContentLoaded', () => {
   const passwordInput = document.getElementById('passwordInput');
   const togglePassword = document.getElementById('togglePassword');
   const checkBtn = document.getElementById('checkBtn');
+  const mutateBtn = document.getElementById('mutateBtn');
   const generateBtn = document.getElementById('generateBtn');
+
+  const mutatedOutput = document.getElementById('mutatedOutput');
+  const mutatedText = document.getElementById('mutatedText');
+  const mutatedNote = document.getElementById('mutatedNote');
+  const copyMutatedBtn = document.getElementById('copyMutatedBtn');
 
   const resultBox = document.getElementById('resultBox');
   const breachStatus = document.getElementById('breachStatus');
@@ -78,12 +85,151 @@ document.addEventListener('DOMContentLoaded', () => {
     passwordInput.value = newPassword;
     passwordInput.type = 'text';
     togglePassword.textContent = '🔒';
+    if (mutatedOutput) mutatedOutput.style.display = 'none';
     
     // Automatically perform audit on generated password
     runAudit();
   });
 
-  // --- 3. ZERO-KNOWLEDGE SHA-1 HASHING & HIBP API CHECK ---
+  // --- 3. INTELLIGENT PASSWORD MUTATOR ALGORITHM ---
+  /**
+   * Mutates an input password by applying:
+   * Step 1: Character substitution (a->@, e->3, i->1, o->0, s->$, t->7)
+   * Step 2: Capitalize first letter
+   * Step 3: Insert random special character at ~3/4 position
+   * Step 4: Length padding (ensure length >= 12)
+   */
+  function mutatePassword(original) {
+    let text = original.trim();
+    if (!text) return "";
+
+    const specialChars = ['!', '#', '@', '$', '%', '&', '*'];
+
+    const getRandomSpecialChar = () => {
+      const buf = new Uint32Array(1);
+      crypto.getRandomValues(buf);
+      return specialChars[buf[0] % specialChars.length];
+    };
+
+    const getRandom2DigitNum = () => {
+      const buf = new Uint32Array(1);
+      crypto.getRandomValues(buf);
+      return 10 + (buf[0] % 90);
+    };
+
+    // Step 1: Character Substitution (Leetspeak)
+    let chars = text.split('');
+    for (let i = 0; i < chars.length; i++) {
+      const c = chars[i];
+      const lower = c.toLowerCase();
+
+      if (lower === 'a') {
+        chars[i] = '@';
+      } else if (lower === 'e') {
+        chars[i] = '3';
+      } else if (lower === 'i') {
+        chars[i] = '1';
+      } else if (lower === 'o') {
+        chars[i] = '0';
+      } else if (lower === 's') {
+        if (i > 0) { // Only replace 's' if NOT the first character
+          chars[i] = '$';
+        }
+      } else if (lower === 't') {
+        chars[i] = '7';
+      }
+    }
+    let mutated = chars.join('');
+
+    // Step 2: Capitalize First Letter
+    if (mutated.length > 0) {
+      const firstChar = mutated.charAt(0);
+      if (firstChar >= 'a' && firstChar <= 'z') {
+        mutated = firstChar.toUpperCase() + mutated.slice(1);
+      }
+    }
+
+    // Step 3: Insert a Random Special Character at ~3/4 position
+    const randomSpec = getRandomSpecialChar();
+    if (mutated.length < 4) {
+      mutated += randomSpec;
+    } else {
+      const insertPos = Math.floor(mutated.length * 0.75);
+      mutated = mutated.slice(0, insertPos) + randomSpec + mutated.slice(insertPos);
+    }
+
+    // Step 4: Length Padding (Ensure >= 12 characters)
+    if (mutated.length < 12) {
+      const num = getRandom2DigitNum();
+      const extraSpec = getRandomSpecialChar();
+      mutated = mutated + num + extraSpec;
+    }
+
+    while (mutated.length < 12) {
+      mutated += getRandomSpecialChar();
+    }
+
+    // Step 5: Return the Mutated Password
+    return mutated;
+  }
+
+  mutateBtn.addEventListener('click', () => {
+    const rawInput = passwordInput.value;
+    const trimmed = rawInput.trim();
+
+    if (!trimmed) {
+      resultBox.style.display = 'block';
+      warningBanner.innerHTML = `<strong>⚠️ Notice:</strong> Enter a password to mutate.`;
+      warningBanner.style.display = 'block';
+      if (mutatedOutput) mutatedOutput.style.display = 'none';
+      return;
+    }
+
+    const mutated = mutatePassword(rawInput);
+    passwordInput.value = mutated;
+    passwordInput.type = 'text'; // Reveal mutated password
+    togglePassword.textContent = '🔒';
+
+    if (mutatedOutput) {
+      mutatedText.textContent = mutated;
+      mutatedOutput.style.display = 'block';
+
+      // Edge Case: Check if original password was already strong (> 16 chars & zxcvbn score 4)
+      if (typeof zxcvbn === 'function') {
+        const origEval = zxcvbn(trimmed);
+        if (trimmed.length > 16 && origEval.score === 4) {
+          mutatedNote.textContent = "Your password is already strong, but here's an alternative.";
+          mutatedNote.style.display = 'block';
+        } else {
+          mutatedNote.style.display = 'none';
+        }
+      } else {
+        mutatedNote.style.display = 'none';
+      }
+    }
+
+    // Automatically trigger audit & entropy evaluation on the mutated password
+    runAudit();
+  });
+
+  if (copyMutatedBtn) {
+    copyMutatedBtn.addEventListener('click', async () => {
+      const textToCopy = mutatedText.textContent;
+      if (textToCopy) {
+        try {
+          await navigator.clipboard.writeText(textToCopy);
+          copyMutatedBtn.textContent = 'Copied!';
+          setTimeout(() => {
+            copyMutatedBtn.textContent = 'Copy';
+          }, 2000);
+        } catch (err) {
+          console.error('Clipboard copy error:', err);
+        }
+      }
+    });
+  }
+
+  // --- 4. ZERO-KNOWLEDGE SHA-1 HASHING & HIBP API CHECK ---
   async function computeSHA1Hex(text) {
     const encoder = new TextEncoder();
     const data = encoder.encode(text);
@@ -120,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return 0;
   }
 
-  // --- 4. ZXCVBN ENTROPY EVALUATION (Option A Corporate Color Palette) ---
+  // --- 5. ZXCVBN ENTROPY EVALUATION (Option A Corporate Color Palette) ---
   const SCORE_MAP = {
     0: { label: "Very Weak 🔴", class: "score-0", color: "#e11d48" }, // Deep Rose
     1: { label: "Weak 🟠", class: "score-1", color: "#f59e0b" },      // Muted Amber
@@ -147,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // --- 5. MAIN AUDIT EXECUTION ---
+  // --- 6. MAIN AUDIT EXECUTION ---
   async function runAudit() {
     let password = passwordInput.value;
     password = password.trim();
@@ -223,7 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter') runAudit();
   });
 
-  // --- 6. CONTEXT MENU AUTO-FILL ---
+  // --- 7. CONTEXT MENU AUTO-FILL ---
   function handleAutoFill(passwordValue) {
     if (passwordValue) {
       passwordInput.value = passwordValue;
