@@ -36,10 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // --- 2. CRYPTOGRAPHICALLY SECURE PASSWORD GENERATOR ---
-  /**
-   * Generates a secure 16-character password using crypto.getRandomValues()
-   * Guarantees a mix of uppercase, lowercase, numbers, and symbols.
-   */
   function generateSecurePassword(length = 16) {
     const charsetUpper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const charsetLower = "abcdefghijklmnopqrstuvwxyz";
@@ -80,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
   generateBtn.addEventListener('click', () => {
     const newPassword = generateSecurePassword(16);
     passwordInput.value = newPassword;
-    passwordInput.type = 'text'; // Reveal generated password briefly
+    passwordInput.type = 'text';
     togglePassword.textContent = '🔒';
     
     // Automatically perform audit on generated password
@@ -88,10 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // --- 3. ZERO-KNOWLEDGE SHA-1 HASHING & HIBP API CHECK ---
-  /**
-   * Computes SHA-1 hash of string using Web Crypto API.
-   * Return uppercase hex digest.
-   */
   async function computeSHA1Hex(text) {
     const encoder = new TextEncoder();
     const data = encoder.encode(text);
@@ -100,11 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
   }
 
-  /**
-   * k-Anonymity Breach Check via HIBP API
-   * Only sends the first 5 hex characters of SHA-1 hash to api.pwnedpasswords.com
-   * Edge Case Handling: Checks for empty API response and immediately returns 0.
-   */
   async function checkBreachStatus(sha1Prefix, sha1Suffix) {
     const url = `https://api.pwnedpasswords.com/range/${sha1Prefix}`;
     const response = await fetch(url, {
@@ -118,9 +105,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const responseText = await response.text();
 
-    // 1. FIX: Handle Empty HIBP API Responses
     if (!responseText || !responseText.trim()) {
-      return 0; // Return 0 breaches immediately without attempting string operations
+      return 0; // Return 0 breaches immediately on empty API response
     }
 
     const lines = responseText.split('\n');
@@ -134,13 +120,13 @@ document.addEventListener('DOMContentLoaded', () => {
     return 0;
   }
 
-  // --- 4. ZXCVBN ENTROPY EVALUATION ---
+  // --- 4. ZXCVBN ENTROPY EVALUATION (Option C Color Palette) ---
   const SCORE_MAP = {
-    0: { label: "Very Weak 🔴", class: "score-0", color: "#ff003c" },
-    1: { label: "Weak 🟠", class: "score-1", color: "#f97316" },
-    2: { label: "Fair 🟡", class: "score-2", color: "#eab308" },
-    3: { label: "Strong 🟢", class: "score-3", color: "#22c55e" },
-    4: { label: "Excellent 🔵", class: "score-4", color: "#38bdf8" }
+    0: { label: "Very Weak 🔴", class: "score-0", color: "#f43f5e" }, // Rose
+    1: { label: "Weak 🟠", class: "score-1", color: "#fb923c" },      // Orange
+    2: { label: "Fair 🟡", class: "score-2", color: "#fbbf24" },      // Amber
+    3: { label: "Strong 🟢", class: "score-3", color: "#34d399" },    // Emerald
+    4: { label: "Excellent 🔵", class: "score-4", color: "#2dd4bf" }   // Teal
   };
 
   function evaluateEntropy(password) {
@@ -164,8 +150,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- 5. MAIN AUDIT EXECUTION ---
   async function runAudit() {
     let password = passwordInput.value;
-    
-    // Sanitize input: Strip leading/trailing spaces, preserve internal spaces for passphrases
     password = password.trim();
 
     if (!password) {
@@ -173,14 +157,13 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // 2. FIX: Loading / Spinner State Setup
+    // Loading State
     checkBtn.disabled = true;
     checkBtn.textContent = '⏳ Checking...';
     if (strengthContainer) strengthContainer.classList.add('loading-pulse');
 
-    // Display Initial Loading State in Result UI
     resultBox.style.display = 'block';
-    breachStatus.innerHTML = `<strong>Breach Status:</strong> <span style="color: var(--primary-cyan);">Checking HIBP database...</span>`;
+    breachStatus.innerHTML = `<strong>Breach Status:</strong> <span style="color: var(--accent-teal);">Checking HIBP database...</span>`;
     strengthLabel.textContent = "Calculating...";
     meterFill.className = "meter-fill";
     meterFill.style.width = "0%";
@@ -189,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
     recommendation.style.display = 'none';
 
     try {
-      // A. Entropy Evaluation (Immediate local math)
+      // A. Entropy Evaluation
       const entropy = evaluateEntropy(password);
       const scoreInfo = SCORE_MAP[entropy.score] || SCORE_MAP[0];
 
@@ -197,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
       strengthLabel.style.color = scoreInfo.color;
       meterFill.className = `meter-fill ${scoreInfo.class}`;
 
-      crackTime.innerHTML = `<strong>Est. Crack Time (Slow Hash):</strong> <span style="color: ${scoreInfo.color}; font-weight: bold;">${entropy.crackTime}</span>`;
+      crackTime.innerHTML = `<strong>Est. Crack Time:</strong> <span style="color: ${scoreInfo.color}; font-weight: bold;">${entropy.crackTime}</span>`;
 
       if (entropy.warning || entropy.suggestions.length > 0) {
         let warnText = entropy.warning ? `<strong>⚠️ Warning:</strong> ${entropy.warning}<br>` : '';
@@ -216,50 +199,44 @@ document.addEventListener('DOMContentLoaded', () => {
       const breachCount = await checkBreachStatus(sha1Prefix, sha1Suffix);
 
       if (breachCount > 0) {
-        breachStatus.innerHTML = `<strong>Breach Status:</strong> <span class="vulnerable">🔴 PWNED (Found in ${breachCount.toLocaleString()} breach leaks!)</span>`;
+        breachStatus.innerHTML = `<strong>Breach Status:</strong> <span class="vulnerable">🔴 PWNED (${breachCount.toLocaleString()} breaches)</span>`;
         
-        // Fortify Recommendation
         const recommendedPw = generateSecurePassword(16);
-        recommendation.innerHTML = `<strong>Recommendation:</strong> Your password was found in a breach! Switch to a secure alternative like: <br><code style="color: #fff; background: rgba(0,0,0,0.5); padding: 4px 6px; border-radius: 4px; display: inline-block; margin-top: 4px;">${recommendedPw}</code>`;
+        recommendation.innerHTML = `<strong>Recommendation:</strong> Switch to a secure alternative: <br><code>${recommendedPw}</code>`;
         recommendation.style.display = 'block';
       } else {
-        breachStatus.innerHTML = `<strong>Breach Status:</strong> <span class="secure">🟢 SAFE (No known data breaches found)</span>`;
+        breachStatus.innerHTML = `<strong>Breach Status:</strong> <span class="secure">🟢 SAFE (No breaches found)</span>`;
       }
 
     } catch (err) {
       console.error("HIBP Check Error:", err);
-      breachStatus.innerHTML = `<strong>Breach Status:</strong> <span style="color: #fbbf24;">⚠️ Network error contacting HIBP database.</span>`;
+      breachStatus.innerHTML = `<strong>Breach Status:</strong> <span style="color: #fbbf24;">⚠️ Network error contacting database.</span>`;
     } finally {
-      // Restore Button & Loading Animation State
       checkBtn.disabled = false;
       checkBtn.textContent = 'Check Password';
       if (strengthContainer) strengthContainer.classList.remove('loading-pulse');
     }
   }
 
-  // Event Listeners
   checkBtn.addEventListener('click', runAudit);
   passwordInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') runAudit();
   });
 
-  // --- 6. FIX: CONTEXT MENU AUTO-FILL & RACE CONDITION HANDLING ---
+  // --- 6. CONTEXT MENU AUTO-FILL ---
   function handleAutoFill(passwordValue) {
     if (passwordValue) {
       passwordInput.value = passwordValue;
-      // Immediate Cleanup: Delete plain-text password from disk storage
       chrome.storage.local.remove(['autoFillPassword']);
       runAudit();
     }
   }
 
   if (chrome.storage && chrome.storage.local) {
-    // Check initial storage state on popup load
     chrome.storage.local.get(['autoFillPassword'], (result) => {
       handleAutoFill(result.autoFillPassword);
     });
 
-    // Listen for live updates (prevents race condition when context menu is clicked while popup is open)
     if (chrome.storage.onChanged) {
       chrome.storage.onChanged.addListener((changes, namespace) => {
         if (namespace === 'local' && changes.autoFillPassword && changes.autoFillPassword.newValue) {

@@ -1,16 +1,35 @@
-/* HashGuard Sentinel - Cyber/Neon Theme CSS */
+/* ==========================================================================
+   HashGuard Sentinel - Premium Glassmorphism Design System (Option C)
+   Clean desktop app aesthetic: matte tones, slate typography, frosted glass.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap');
+
 :root {
-  --bg-gradient: linear-gradient(135deg, #090b14, #12182b);
-  --primary-cyan: #38bdf8;
-  --primary-cyan-hover: #7dd3fc;
-  --accent-purple: #a855f7;
-  --accent-purple-hover: #c084fc;
-  --card-bg: rgba(15, 23, 42, 0.85);
-  --border-color: rgba(56, 189, 248, 0.3);
-  --text-main: #e0f2fe;
-  --text-muted: #94a3b8;
-  --danger-red: #ff003c;
-  --success-green: #00ff88;
+  /* Color Palette - Premium Native Desktop Aesthetic */
+  --bg-main: #0b1121;                             /* Deep Navy */
+  --card-bg: rgba(255, 255, 255, 0.06);           /* Frosted Glass Container */
+  --card-border: 1px solid rgba(255, 255, 255, 0.08);
+  --backdrop-blur: blur(12px);
+
+  --input-bg: rgba(255, 255, 255, 0.08);          /* Subdued Input Field */
+  --input-border: 1px solid rgba(255, 255, 255, 0.12);
+  --focus-ring: 0 0 0 3px rgba(45, 212, 191, 0.3); /* Subtle Teal Focus Ring */
+
+  --text-primary: #f1f5f9;                        /* Off-white */
+  --text-secondary: #94a3b8;                      /* Slate Gray */
+
+  --accent-teal: #2dd4bf;                         /* Primary Matte Teal Accent */
+  --accent-hover: #5eead4;                        /* Light Teal Hover */
+
+  --danger-rose: #f43f5e;                         /* Matte Rose */
+  --danger-bg: rgba(244, 63, 94, 0.15);
+
+  --success-emerald: #34d399;                     /* Matte Emerald */
+  --success-bg: rgba(52, 211, 153, 0.15);
+
+  --warning-amber: #fbbf24;                       /* Matte Amber */
+  --warning-bg: rgba(251, 191, 36, 0.15);
 }
 
 * {
@@ -18,37 +37,37 @@
 }
 
 body {
-  width: 350px;
+  width: 340px;
   min-height: 420px;
-  padding: 18px;
-  font-family: 'Consolas', 'Courier New', monospace, sans-serif;
-  background: var(--bg-gradient);
-  color: var(--text-main);
+  padding: 20px;
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   margin: 0;
 }
 
+/* Header */
 .header {
   text-align: center;
-  margin-bottom: 18px;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 10px;
+  margin-bottom: 20px;
 }
 
 .header h2 {
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 19px;
+  color: var(--text-primary);
   margin: 0;
-  font-size: 20px;
-  color: var(--primary-cyan);
-  text-transform: uppercase;
-  letter-spacing: 2.5px;
-  text-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+  letter-spacing: -0.3px;
 }
 
 .header .tagline {
-  font-size: 11px;
-  color: var(--text-muted);
+  font-size: 12px;
+  color: var(--text-secondary);
   margin-top: 4px;
 }
 
+/* Input Fields */
 .input-container {
   position: relative;
   margin-bottom: 14px;
@@ -58,178 +77,202 @@ body {
 input[type="password"],
 input[type="text"] {
   width: 100%;
-  padding: 12px;
-  padding-right: 42px;
-  border: 1px solid var(--primary-cyan);
-  border-radius: 6px;
-  background-color: var(--card-bg);
-  color: #fff;
-  font-family: inherit;
+  padding: 12px 40px 12px 14px;
+  background: var(--input-bg);
+  border: var(--input-border);
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
   outline: none;
-  box-shadow: inset 0 0 8px rgba(56, 189, 248, 0.2);
-  transition: all 0.25s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 input:focus {
-  border-color: var(--primary-cyan-hover);
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.6), inset 0 0 8px rgba(56, 189, 248, 0.3);
+  border-color: var(--accent-teal);
+  box-shadow: var(--focus-ring);
 }
 
 .toggle-password {
   position: absolute;
-  right: 12px;
+  right: 14px;
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
-  color: var(--primary-cyan);
-  opacity: 0.8;
+  color: var(--text-secondary);
+  font-size: 15px;
   user-select: none;
-  font-size: 16px;
-  transition: opacity 0.2s, text-shadow 0.2s;
+  transition: color 0.2s ease;
 }
 
 .toggle-password:hover {
-  opacity: 1;
-  text-shadow: 0 0 8px var(--primary-cyan);
+  color: var(--text-primary);
 }
 
+/* Buttons */
 .button-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 10px;
+  margin-bottom: 18px;
 }
 
 button {
   width: 100%;
-  padding: 10px 14px;
-  background-color: transparent;
-  border-radius: 6px;
-  font-family: inherit;
-  font-weight: bold;
-  text-transform: uppercase;
-  font-size: 12px;
-  letter-spacing: 1px;
+  padding: 11px 16px;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
   cursor: pointer;
-  transition: all 0.25s ease;
+  border: none;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
 }
 
 button:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 #checkBtn {
-  color: var(--primary-cyan);
-  border: 1px solid var(--primary-cyan);
-  box-shadow: 0 0 8px rgba(56, 189, 248, 0.25);
+  background-color: var(--accent-teal);
+  color: #0b1121; /* High contrast dark text on matte teal */
 }
 
 #checkBtn:hover:not(:disabled) {
-  background-color: var(--primary-cyan);
-  color: #090b14;
-  box-shadow: 0 0 15px rgba(56, 189, 248, 0.8);
+  background-color: var(--accent-hover);
 }
 
 #generateBtn {
-  color: var(--accent-purple);
-  border: 1px solid var(--accent-purple);
-  box-shadow: 0 0 8px rgba(168, 85, 247, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 #generateBtn:hover:not(:disabled) {
-  background-color: var(--accent-purple);
-  color: #fff;
-  box-shadow: 0 0 15px rgba(168, 85, 247, 0.8);
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
 }
 
+/* Glassmorphism Result Container */
 .result-box {
-  padding: 14px;
-  background-color: var(--card-bg);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 6px;
-  font-size: 12px;
+  padding: 16px;
+  background: var(--card-bg);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border: var(--card-border);
+  border-radius: 12px;
+  font-size: 13px;
   display: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-  transition: box-shadow 0.3s ease;
-}
-
-/* Pulsing Animation for Loading State */
-@keyframes pulseGlow {
-  0% { opacity: 0.65; box-shadow: 0 0 4px rgba(56, 189, 248, 0.3); }
-  50% { opacity: 1; box-shadow: 0 0 16px rgba(56, 189, 248, 0.8); }
-  100% { opacity: 0.65; box-shadow: 0 0 4px rgba(56, 189, 248, 0.3); }
 }
 
 .loading-pulse {
-  animation: pulseGlow 1.2s infinite ease-in-out;
+  opacity: 0.75;
 }
 
 .result-row {
-  margin-bottom: 10px;
-  line-height: 1.4;
+  margin-bottom: 12px;
+  line-height: 1.45;
 }
 
 .result-row:last-child {
   margin-bottom: 0;
 }
 
+/* Bordered Pill Badges for Status */
 .vulnerable {
-  color: var(--danger-red);
-  text-shadow: 0 0 8px rgba(255, 0, 60, 0.6);
-  font-weight: bold;
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background-color: var(--danger-bg);
+  color: var(--danger-rose);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .secure {
-  color: var(--success-green);
-  text-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
-  font-weight: bold;
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background-color: var(--success-bg);
+  color: var(--success-emerald);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  font-size: 12px;
+  font-weight: 500;
 }
 
-/* Strength Meter Progress Bar */
+/* Strength Meter & Flat Progress Bar */
 .meter-label-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+
+.meter-label-container span:first-child {
+  color: var(--text-secondary);
+}
+
+#strengthLabel {
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-weight: 600;
 }
 
 .meter-track {
   width: 100%;
-  height: 8px;
-  background-color: #1e293b;
-  border-radius: 4px;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
   overflow: hidden;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .meter-fill {
   height: 100%;
   width: 0%;
-  transition: width 0.35s ease, background-color 0.35s ease;
+  border-radius: 999px;
+  transition: width 0.3s ease, background-color 0.3s ease;
 }
 
-.score-0 { width: 20%; background-color: #ff003c; box-shadow: 0 0 8px #ff003c; }
-.score-1 { width: 40%; background-color: #f97316; box-shadow: 0 0 8px #f97316; }
-.score-2 { width: 60%; background-color: #eab308; box-shadow: 0 0 8px #eab308; }
-.score-3 { width: 80%; background-color: #22c55e; box-shadow: 0 0 8px #22c55e; }
-.score-4 { width: 100%; background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8; }
+/* Strict Score Matte Colors (No Glowing Effects) */
+.score-0 { width: 20%; background-color: #f43f5e; } /* Rose */
+.score-1 { width: 40%; background-color: #fb923c; } /* Orange */
+.score-2 { width: 60%; background-color: #fbbf24; } /* Amber */
+.score-3 { width: 80%; background-color: #34d399; } /* Emerald */
+.score-4 { width: 100%; background-color: #2dd4bf; } /* Teal */
 
+/* Warning & Feedback Banner */
 .warning-banner {
-  margin-top: 8px;
-  padding: 8px;
-  background-color: rgba(251, 191, 36, 0.1);
-  border-left: 3px solid #fbbf24;
-  color: #fbbf24;
+  margin-top: 10px;
+  padding: 10px 12px;
+  background-color: var(--warning-bg);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  color: var(--warning-amber);
   font-size: 11px;
-  border-radius: 2px;
+  border-radius: 8px;
+  line-height: 1.45;
 }
 
+/* Recommendation Box */
 .recommendation-box {
-  margin-top: 10px;
-  color: var(--accent-purple);
-  border-top: 1px dashed rgba(168, 85, 247, 0.3);
-  padding-top: 8px;
+  margin-top: 12px;
+  color: var(--text-secondary);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 10px;
   word-break: break-all;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.recommendation-box code {
+  color: var(--text-primary);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: inline-block;
+  margin-top: 6px;
+  font-family: 'Consolas', 'Courier New', monospace;
 }
