@@ -282,23 +282,53 @@ def process_bulk(filepath, export_path=None, quiet=False):
 
 def interactive_mode():
     """Default interactive CLI mode when no arguments are provided."""
-    print("--- HASHGUARD TERMINAL ---")
-    user_pw = getpass.getpass("Enter a password to test (input hidden): ")
+    print("==================================================")
+    print("🛡️ HASHGUARD SENTINEL - INTERACTIVE MODE")
+    print("Type 'exit' or 'quit' to stop.")
+    print("==================================================\n")
 
-    if not user_pw.strip():
-        print("❌ Empty password entered.")
-        return
+    score_labels = {0: "Very Weak", 1: "Weak", 2: "Fair", 3: "Strong", 4: "Excellent"}
 
-    breach_status = check_pwned_api_single(user_pw.strip())
-    score, crack_time = evaluate_password_strength(user_pw.strip())
+    try:
+        while True:
+            try:
+                if sys.stdin.isatty():
+                    user_pw = getpass.getpass("Enter password to check (or 'exit' to quit): ")
+                else:
+                    user_pw = input("Enter password to check (or 'exit' to quit): ")
+            except (EOFError, KeyboardInterrupt):
+                print("\nGoodbye! 🛡️")
+                break
+            except Exception:
+                user_pw = input("Enter password to check (or 'exit' to quit): ")
 
-    print(f"\n[!] Breach Status: {breach_status}")
-    print(f"[!] Est. Crack Time: {crack_time}")
+            cleaned_pw = user_pw.strip()
 
-    if "VULNERABLE" in breach_status:
-        print(f"[!] Recommendation: {recommend_strong_password(user_pw.strip())}")
-    else:
-        print("[!] Recommendation: No leaks found. Your password is secure!")
+            if cleaned_pw.lower() in ["exit", "quit"]:
+                print("Goodbye! 🛡️")
+                break
+
+            if not cleaned_pw:
+                print("❌ Password cannot be empty. Try again.\n")
+                continue
+
+            breach_status = check_pwned_api_single(cleaned_pw)
+            score, crack_time = evaluate_password_strength(cleaned_pw)
+            label = score_labels.get(score, "Weak")
+
+            print(f"\n[!] Breach Status: {breach_status}")
+            print(f"[!] Strength: {label} (Est. Crack Time: {crack_time})")
+
+            if "VULNERABLE" in breach_status:
+                print(f"[!] Recommendation: {recommend_strong_password(cleaned_pw)}")
+            else:
+                print("[!] Recommendation: No leaks found. Your password is secure!")
+
+            print("-" * 50)
+            print()
+
+    except KeyboardInterrupt:
+        print("\nGoodbye! 🛡️")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="HashGuard Sentinel - Zero-Knowledge Password Audit Tool")
