@@ -1,129 +1,271 @@
-// 1. Calculate Crack Time (Upgraded with zxcvbn)
-function estimateCrackTime(password) {
-    if (!password) return "Instant";
-    
-    // zxcvbn does all the hardcore math, dictionary checks, and pattern recognition!
-    const evaluation = zxcvbn(password);
-    
-    // The library returns a human-readable string like "less than a second" or "centuries"
-    let timeString = evaluation.crack_times_display.offline_fast_hashing_1e10_per_second;
-    
-    // Let's add color-coding based on the score (0 is worst, 4 is best)
-    let color = "#ff003c"; // Red
-    if (evaluation.score === 2) color = "#fbbf24"; // Yellow
-    if (evaluation.score === 3) color = "#4ade80"; // Green
-    if (evaluation.score === 4) color = "#0ea5e9"; // Blue/Cyan (Uncrackable)
-    
-    // If the score is bad, zxcvbn even tells us WHY! (e.g., "This is a common password")
-    let warning = "";
-    if (evaluation.feedback.warning) {
-        warning = `<br><span style="color:#fbbf24; font-size:11px;">⚠️ ${evaluation.feedback.warning}</span>`;
-    }
-    
-    return `<span style="color: ${color}; font-weight: bold;">${timeString}</span>${warning}`;
-}
+/**
+ * HashGuard Sentinel - Popup Logic
+ * Security-focused browser extension logic featuring:
+ * 1. Zero-Knowledge SHA-1 Hashing (Web Crypto API) & k-Anonymity HIBP breach lookup
+ * 2. Empty response guard for HIBP range API
+ * 3. Loading state / spinner & rate-limiting protection
+ * 4. Local zxcvbn entropy evaluation (score, visual progress bar, crack time display)
+ * 5. Cryptographically secure 16-character password generator (crypto.getRandomValues)
+ * 6. Context menu auto-fill with storage.onChanged listener & immediate cleanup
+ */
 
-// 2. Recommend Password Logic
-function recommendStrongPassword(oldPassword) {
-    const replacements = {'a': '@', 's': '$', 'i': '!', 'o': '0', 'e': '3'};
-    let newPw = oldPassword.split('').map(c => replacements[c.toLowerCase()] || c).join('');
-    
-    const extraChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
-    while (newPw.length < 14) {
-        newPw += extraChars.charAt(Math.floor(Math.random() * extraChars.length));
-    }
-    return newPw;
-}
+document.addEventListener('DOMContentLoaded', () => {
+  const passwordInput = document.getElementById('passwordInput');
+  const togglePassword = document.getElementById('togglePassword');
+  const checkBtn = document.getElementById('checkBtn');
+  const generateBtn = document.getElementById('generateBtn');
 
-// 3. Generator Function
-function generateRandomPassword(length = 16) {
-    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*-_=+";
-    let password = "";
-    for (let i = 0; i < length; i++) {
-        password += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return password;
-}
+  const resultBox = document.getElementById('resultBox');
+  const breachStatus = document.getElementById('breachStatus');
+  const strengthContainer = document.getElementById('strengthContainer');
+  const strengthLabel = document.getElementById('strengthLabel');
+  const meterFill = document.getElementById('meterFill');
+  const crackTime = document.getElementById('crackTime');
+  const warningBanner = document.getElementById('warningBanner');
+  const recommendation = document.getElementById('recommendation');
 
-// --- EVENT LISTENERS ---
-
-// Show/Hide Password Toggle
-document.getElementById('togglePassword').addEventListener('click', function() {
-    const pwdInput = document.getElementById('passwordInput');
-    if (pwdInput.type === 'password') {
-        pwdInput.type = 'text';
-        this.textContent = '🔒'; // Change icon to lock
+  // --- 1. EYE TOGGLE (SHOW / HIDE PASSWORD) ---
+  togglePassword.addEventListener('click', () => {
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      togglePassword.textContent = '🔒';
     } else {
-        pwdInput.type = 'password';
-        this.textContent = '👁️'; // Change icon to eye
+      passwordInput.type = 'password';
+      togglePassword.textContent = '👁️';
     }
-});
+  });
 
-// Generate Button Click
-document.getElementById('generateBtn').addEventListener('click', () => {
-    const newPassword = generateRandomPassword(16);
-    const pwdInput = document.getElementById('passwordInput');
-    pwdInput.value = newPassword;
-    pwdInput.type = 'text'; // Briefly show the generated password
-    document.getElementById('togglePassword').textContent = '🔒';
-    
-    // Automatically trigger the check!
-    document.getElementById('checkBtn').click();
-});
+  // --- 2. CRYPTOGRAPHICALLY SECURE PASSWORD GENERATOR ---
+  /**
+   * Generates a secure 16-character password using crypto.getRandomValues()
+   * Guarantees a mix of uppercase, lowercase, numbers, and symbols.
+   */
+  function generateSecurePassword(length = 16) {
+    const charsetUpper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const charsetLower = "abcdefghijklmnopqrstuvwxyz";
+    const charsetDigits = "0123456789";
+    const charsetSymbols = "!@#$%^&*()_+-=[]{}|;:,.<>?";
+    const allChars = charsetUpper + charsetLower + charsetDigits + charsetSymbols;
 
-// Main Event Listener (Check Status)
-document.getElementById('checkBtn').addEventListener('click', async () => {
-    const password = document.getElementById('passwordInput').value;
-    const resultBox = document.getElementById('resultBox');
-    const breachStatus = document.getElementById('breachStatus');
-    const crackTime = document.getElementById('crackTime');
-    const recommendation = document.getElementById('recommendation');
+    const getRandomChar = (str) => {
+      const array = new Uint32Array(1);
+      crypto.getRandomValues(array);
+      return str[array[0] % str.length];
+    };
+
+    let passwordChars = [
+      getRandomChar(charsetUpper),
+      getRandomChar(charsetLower),
+      getRandomChar(charsetDigits),
+      getRandomChar(charsetSymbols)
+    ];
+
+    const randomBuffer = new Uint32Array(length - 4);
+    crypto.getRandomValues(randomBuffer);
+    for (let i = 0; i < randomBuffer.length; i++) {
+      passwordChars.push(allChars[randomBuffer[i] % allChars.length]);
+    }
+
+    // Cryptographically shuffle array (Fisher-Yates)
+    for (let i = passwordChars.length - 1; i > 0; i--) {
+      const swapBuf = new Uint32Array(1);
+      crypto.getRandomValues(swapBuf);
+      const j = swapBuf[0] % (i + 1);
+      [passwordChars[i], passwordChars[j]] = [passwordChars[j], passwordChars[i]];
+    }
+
+    return passwordChars.join('');
+  }
+
+  generateBtn.addEventListener('click', () => {
+    const newPassword = generateSecurePassword(16);
+    passwordInput.value = newPassword;
+    passwordInput.type = 'text'; // Reveal generated password briefly
+    togglePassword.textContent = '🔒';
     
-    if (!password) return;
+    // Automatically perform audit on generated password
+    runAudit();
+  });
+
+  // --- 3. ZERO-KNOWLEDGE SHA-1 HASHING & HIBP API CHECK ---
+  /**
+   * Computes SHA-1 hash of string using Web Crypto API.
+   * Return uppercase hex digest.
+   */
+  async function computeSHA1Hex(text) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(text);
+    const hashBuffer = await crypto.subtle.digest('SHA-1', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+  }
+
+  /**
+   * k-Anonymity Breach Check via HIBP API
+   * Only sends the first 5 hex characters of SHA-1 hash to api.pwnedpasswords.com
+   * Edge Case Handling: Checks for empty API response and immediately returns 0.
+   */
+  async function checkBreachStatus(sha1Prefix, sha1Suffix) {
+    const url = `https://api.pwnedpasswords.com/range/${sha1Prefix}`;
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: { 'Add-Padding': 'true' }
+    });
+
+    if (!response.ok) {
+      throw new Error(`API Error Status: ${response.status}`);
+    }
+
+    const responseText = await response.text();
+
+    // 1. FIX: Handle Empty HIBP API Responses
+    if (!responseText || !responseText.trim()) {
+      return 0; // Return 0 breaches immediately without attempting string operations
+    }
+
+    const lines = responseText.split('\n');
+
+    for (let line of lines) {
+      const [suffix, count] = line.trim().split(':');
+      if (suffix && suffix.toUpperCase() === sha1Suffix) {
+        return parseInt(count, 10);
+      }
+    }
+    return 0;
+  }
+
+  // --- 4. ZXCVBN ENTROPY EVALUATION ---
+  const SCORE_MAP = {
+    0: { label: "Very Weak 🔴", class: "score-0", color: "#ff003c" },
+    1: { label: "Weak 🟠", class: "score-1", color: "#f97316" },
+    2: { label: "Fair 🟡", class: "score-2", color: "#eab308" },
+    3: { label: "Strong 🟢", class: "score-3", color: "#22c55e" },
+    4: { label: "Excellent 🔵", class: "score-4", color: "#38bdf8" }
+  };
+
+  function evaluateEntropy(password) {
+    if (typeof zxcvbn !== 'function') {
+      return { score: 0, crackTime: "Library offline", warning: "", suggestions: [] };
+    }
+    const evalResult = zxcvbn(password);
+    const score = evalResult.score;
+    const crackTimeDisplay = evalResult.crack_times_display.offline_slow_hashing_1e4_per_second || "Instant";
+    const warning = evalResult.feedback.warning || "";
+    const suggestions = evalResult.feedback.suggestions || [];
+
+    return {
+      score,
+      crackTime: crackTimeDisplay,
+      warning,
+      suggestions
+    };
+  }
+
+  // --- 5. MAIN AUDIT EXECUTION ---
+  async function runAudit() {
+    let password = passwordInput.value;
     
+    // Sanitize input: Strip leading/trailing spaces, preserve internal spaces for passphrases
+    password = password.trim();
+
+    if (!password) {
+      resultBox.style.display = 'none';
+      return;
+    }
+
+    // 2. FIX: Loading / Spinner State Setup
+    checkBtn.disabled = true;
+    checkBtn.textContent = '⏳ Checking...';
+    if (strengthContainer) strengthContainer.classList.add('loading-pulse');
+
+    // Display Initial Loading State in Result UI
     resultBox.style.display = 'block';
-    breachStatus.innerHTML = "Checking database...";
-    crackTime.innerHTML = "";
-    recommendation.innerHTML = "";
+    breachStatus.innerHTML = `<strong>Breach Status:</strong> <span style="color: var(--primary-cyan);">Checking HIBP database...</span>`;
+    strengthLabel.textContent = "Calculating...";
+    meterFill.className = "meter-fill";
+    meterFill.style.width = "0%";
+    crackTime.textContent = "";
+    warningBanner.style.display = 'none';
+    recommendation.style.display = 'none';
 
     try {
-        // SHA-1 Hashing
-        const msgBuffer = new TextEncoder().encode(password);
-        const hashBuffer = await crypto.subtle.digest('SHA-1', msgBuffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
-        
-        const prefix = hashHex.slice(0, 5);
-        const suffix = hashHex.slice(5);
+      // A. Entropy Evaluation (Immediate local math)
+      const entropy = evaluateEntropy(password);
+      const scoreInfo = SCORE_MAP[entropy.score] || SCORE_MAP[0];
 
-        // Fetch from HIBP API
-        const response = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
-        const text = await response.text();
-        
-        const lines = text.split('\n');
-        let foundCount = 0;
-        
-        for (let line of lines) {
-            if (line.startsWith(suffix)) {
-                foundCount = line.split(':')[1].trim();
-                break;
-            }
+      strengthLabel.textContent = scoreInfo.label;
+      strengthLabel.style.color = scoreInfo.color;
+      meterFill.className = `meter-fill ${scoreInfo.class}`;
+
+      crackTime.innerHTML = `<strong>Est. Crack Time (Slow Hash):</strong> <span style="color: ${scoreInfo.color}; font-weight: bold;">${entropy.crackTime}</span>`;
+
+      if (entropy.warning || entropy.suggestions.length > 0) {
+        let warnText = entropy.warning ? `<strong>⚠️ Warning:</strong> ${entropy.warning}<br>` : '';
+        if (entropy.suggestions.length > 0) {
+          warnText += `💡 <em>${entropy.suggestions.join(' ')}</em>`;
         }
+        warningBanner.innerHTML = warnText;
+        warningBanner.style.display = 'block';
+      }
 
-        // Update UI: Breach Status
-        if (foundCount > 0) {
-            breachStatus.innerHTML = `Breach Status: <span class="vulnerable">VULNERABLE! Found in ${foundCount} leaks.</span>`;
-            // Only recommend if breached
-            recommendation.innerHTML = `Recommendation: Try <strong style="color: #fff;">${recommendStrongPassword(password)}</strong>`;
-        } else {
-            breachStatus.innerHTML = `Breach Status: <span class="secure">SECURE! No leaks found.</span>`;
-            recommendation.innerHTML = `Recommendation: No leaks found. Your password is secure!`;
-        }
+      // B. Zero-Knowledge HIBP Breach Check
+      const fullHash = await computeSHA1Hex(password);
+      const sha1Prefix = fullHash.substring(0, 5);
+      const sha1Suffix = fullHash.substring(5);
 
-        // Update UI: Crack Time (Using zxcvbn!)
-        crackTime.innerHTML = `Est. Crack Time: ${estimateCrackTime(password)}`;
+      const breachCount = await checkBreachStatus(sha1Prefix, sha1Suffix);
 
-    } catch (error) {
-        breachStatus.innerHTML = "Error connecting to API.";
+      if (breachCount > 0) {
+        breachStatus.innerHTML = `<strong>Breach Status:</strong> <span class="vulnerable">🔴 PWNED (Found in ${breachCount.toLocaleString()} breach leaks!)</span>`;
+        
+        // Fortify Recommendation
+        const recommendedPw = generateSecurePassword(16);
+        recommendation.innerHTML = `<strong>Recommendation:</strong> Your password was found in a breach! Switch to a secure alternative like: <br><code style="color: #fff; background: rgba(0,0,0,0.5); padding: 4px 6px; border-radius: 4px; display: inline-block; margin-top: 4px;">${recommendedPw}</code>`;
+        recommendation.style.display = 'block';
+      } else {
+        breachStatus.innerHTML = `<strong>Breach Status:</strong> <span class="secure">🟢 SAFE (No known data breaches found)</span>`;
+      }
+
+    } catch (err) {
+      console.error("HIBP Check Error:", err);
+      breachStatus.innerHTML = `<strong>Breach Status:</strong> <span style="color: #fbbf24;">⚠️ Network error contacting HIBP database.</span>`;
+    } finally {
+      // Restore Button & Loading Animation State
+      checkBtn.disabled = false;
+      checkBtn.textContent = 'Check Password';
+      if (strengthContainer) strengthContainer.classList.remove('loading-pulse');
     }
+  }
+
+  // Event Listeners
+  checkBtn.addEventListener('click', runAudit);
+  passwordInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') runAudit();
+  });
+
+  // --- 6. FIX: CONTEXT MENU AUTO-FILL & RACE CONDITION HANDLING ---
+  function handleAutoFill(passwordValue) {
+    if (passwordValue) {
+      passwordInput.value = passwordValue;
+      // Immediate Cleanup: Delete plain-text password from disk storage
+      chrome.storage.local.remove(['autoFillPassword']);
+      runAudit();
+    }
+  }
+
+  if (chrome.storage && chrome.storage.local) {
+    // Check initial storage state on popup load
+    chrome.storage.local.get(['autoFillPassword'], (result) => {
+      handleAutoFill(result.autoFillPassword);
+    });
+
+    // Listen for live updates (prevents race condition when context menu is clicked while popup is open)
+    if (chrome.storage.onChanged) {
+      chrome.storage.onChanged.addListener((changes, namespace) => {
+        if (namespace === 'local' && changes.autoFillPassword && changes.autoFillPassword.newValue) {
+          handleAutoFill(changes.autoFillPassword.newValue);
+        }
+      });
+    }
+  }
 });
