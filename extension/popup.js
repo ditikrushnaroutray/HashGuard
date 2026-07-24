@@ -120,13 +120,13 @@ document.addEventListener('DOMContentLoaded', () => {
     return 0;
   }
 
-  // --- 4. ZXCVBN ENTROPY EVALUATION (Option C Color Palette) ---
+  // --- 4. ZXCVBN ENTROPY EVALUATION (Option A Corporate Color Palette) ---
   const SCORE_MAP = {
-    0: { label: "Very Weak 🔴", class: "score-0", color: "#f43f5e" }, // Rose
-    1: { label: "Weak 🟠", class: "score-1", color: "#fb923c" },      // Orange
-    2: { label: "Fair 🟡", class: "score-2", color: "#fbbf24" },      // Amber
-    3: { label: "Strong 🟢", class: "score-3", color: "#34d399" },    // Emerald
-    4: { label: "Excellent 🔵", class: "score-4", color: "#2dd4bf" }   // Teal
+    0: { label: "Very Weak 🔴", class: "score-0", color: "#e11d48" }, // Deep Rose
+    1: { label: "Weak 🟠", class: "score-1", color: "#f59e0b" },      // Muted Amber
+    2: { label: "Fair 🟡", class: "score-2", color: "#4f8cf7" },      // Corporate Blue
+    3: { label: "Strong 🟢", class: "score-3", color: "#10b981" },    // Muted Emerald
+    4: { label: "Excellent 🔵", class: "score-4", color: "#10b981" }   // Muted Emerald
   };
 
   function evaluateEntropy(password) {
@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (strengthContainer) strengthContainer.classList.add('loading-pulse');
 
     resultBox.style.display = 'block';
-    breachStatus.innerHTML = `<strong>Breach Status:</strong> <span style="color: var(--accent-teal);">Checking HIBP database...</span>`;
+    breachStatus.innerHTML = `<strong>Breach Status:</strong> <span style="color: var(--accent-blue);">Checking HIBP database...</span>`;
     strengthLabel.textContent = "Calculating...";
     meterFill.className = "meter-fill";
     meterFill.style.width = "0%";
@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
       strengthLabel.style.color = scoreInfo.color;
       meterFill.className = `meter-fill ${scoreInfo.class}`;
 
-      crackTime.innerHTML = `<strong>Est. Crack Time:</strong> <span style="color: ${scoreInfo.color}; font-weight: bold;">${entropy.crackTime}</span>`;
+      crackTime.innerHTML = `<strong>Est. Crack Time:</strong> <span style="color: ${scoreInfo.color}; font-weight: 600;">${entropy.crackTime}</span>`;
 
       if (entropy.warning || entropy.suggestions.length > 0) {
         let warnText = entropy.warning ? `<strong>⚠️ Warning:</strong> ${entropy.warning}<br>` : '';
@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     } catch (err) {
       console.error("HIBP Check Error:", err);
-      breachStatus.innerHTML = `<strong>Breach Status:</strong> <span style="color: #fbbf24;">⚠️ Network error contacting database.</span>`;
+      breachStatus.innerHTML = `<strong>Breach Status:</strong> <span style="color: #f59e0b;">⚠️ Network error contacting database.</span>`;
     } finally {
       checkBtn.disabled = false;
       checkBtn.textContent = 'Check Password';
