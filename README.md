@@ -1,36 +1,185 @@
- # 🛡️ HashGuard Sentinel
-![Build Status](https://img.shields.io/badge/Build-Passing-4ade80?style=for-the-badge)
-![Security](https://img.shields.io/badge/Security-Verified-blueviolet?style=for-the-badge)
-![Stars](https://img.shields.io/github/stars/ditikrushnaroutray/HashGuard?style=for-the-badge&color=38bdf8)
-![Forks](https://img.shields.io/github/forks/ditikrushnaroutray/HashGuard?style=for-the-badge&color=7dd3fc)
-![License](https://img.shields.io/github/license/ditikrushnaroutray/HashGuard?style=for-the-badge&color=4ade80)
+# 🛡️ HashGuard Sentinel
+
+[![License](https://img.shields.io/github/license/ditikrushnaroutray/HashGuard?style=for-the-badge&color=4f8cf7)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![Manifest V3](https://img.shields.io/badge/Browser_Extension-Manifest_V3-10b981?style=for-the-badge&logo=googlechrome&logoColor=white)](extension/)
+[![Privacy](https://img.shields.io/badge/Privacy-Zero--Knowledge-e11d48?style=for-the-badge)](https://haveibeenpwned.com/API/v3#SearchingPwnedPasswordsByRange)
+
+**HashGuard Sentinel** is a dual-tier cybersecurity suite featuring a **Manifest V3 Browser Extension** and an **Enterprise Python CLI Tool**. It allows security analysts, system administrators, and privacy-conscious users to evaluate password strength, audit bulk credential datasets, and generate high-entropy alternatives—all without ever exposing plain-text passwords or full hashes to external servers.
 
 ---
 
-## 📖 Project Overview
-**HashGuard** is a security intelligence utility developed to bridge the gap between user convenience and robust data protection. This project explores the intersection of **Network Security** and **Data Privacy**.
+## 🔒 The Zero-Knowledge Privacy Guarantee
 
-Unlike standard checkers, HashGuard prioritizes user anonymity by implementing a **local hashing protocol**, ensuring that sensitive plain-text data never leaves the client's environment.
+HashGuard Sentinel is engineered under strict **Zero-Knowledge** principles:
 
-## 🚀 Features
-- **Breach Intelligence:** Uses the **Have I Been Pwned (HIBP) API** with *k-Anonymity* to check if your password has been leaked in known data breaches without ever sending your plain-text password over the internet.
-- **Crack-Time Estimation:** Calculates entropy based on character sets (Lowercase, Uppercase, Digits, Symbols) to estimate brute-force resistance.
-- **Fortification Engine:** Suggests a high-entropy, secure version of your password using leetspeak substitution and random padding.
+- **k-Anonymity Model:** When auditing a password against the Have I Been Pwned (HIBP) database, HashGuard hashes the password locally using **SHA-1** and sends **ONLY the first 5 characters** (`prefix`) to the HIBP API.
+- **Local Suffix Matching:** The API responds with a list of leaked hash suffixes sharing that 5-character prefix. Full hash suffix matching is performed 100% locally in your browser or terminal environment.
+- **Client-Side Entropy Evaluation:** Strength assessment uses a bundled offline copy of `zxcvbn.js` (browser extension) or the Python `zxcvbn` module (CLI). No metrics or passwords are sent to third-party telemetry services.
+- **Zero Disk Persistence:** Plain-text passwords and hashes are purged from memory immediately after evaluation.
 
-## 🛠️ Technical Stack
-- **Language:** Python 3.x
-- **Libraries:** `requests`, `hashlib`, `re`
-- **Security Protocols:** SHA-1 Hashing, k-Anonymity (API interaction)
+```
+┌─────────────────┐       SHA-1 Hash       ┌────────────────────────┐
+│ Plaintext Input │ ────────────────────>  │  5-Char SHA-1 Prefix   │
+└─────────────────┘                        └───────────┬────────────┘
+                                                       │  Send Prefix Only
+                                                       ▼
+┌─────────────────┐      Local Match       ┌────────────────────────┐
+│  Breach Result  │ <────────────────────  │ HIBP Range API (200 OK)│
+└─────────────────┘  Suffix Comparison     └────────────────────────┘
+```
 
-## 🚧 Project Roadmap (Current Status)
-- [x] Core Python Logic (Complete)
-- [x] HIBP API Integration (Complete)
-- [ ] **Next Phase: Browser Extension (In Development)** 🛠️
-  - Translating Python logic to JavaScript.
-  - Creating a Chrome/Brave Manifest V3 extension.
-  - Building a clean, dark-themed UI for real-time password checking while browsing.
- 
-## ⚙️ How to Run (Terminal Version)
-1. Clone the repository:
+---
+
+## ✨ Features
+
+### 🧩 1. Browser Extension (Chrome, Brave, Edge)
+- **Corporate Dark Aesthetic:** Designed with "The Security Suite" Design System (Option A)—flat, high-contrast, professional matte dark layout.
+- **Intelligent Password Mutator ("✨ Suggest Safer Version"):** Transforms weak or breached passwords into 12+ character high-entropy variants that retain ~90% of the original character structure for memorability.
+- **Cryptographic Generator:** Built-in 16-character generator powered by `crypto.getRandomValues` and Fisher-Yates shuffle algorithms.
+- **Context Menu Integration:** Right-click selected password fields to inspect credentials via HashGuard with automated single-use memory cleanup.
+
+### 💻 2. Enterprise Python CLI Tool (`main.py`)
+- **Persistent Interactive Session:** Run `python main.py` for a continuous interactive auditing terminal with instant feedback, recommendations, and graceful exit handling.
+- **Enterprise Bulk Audit Mode (`--bulk`):** Audit hundreds of credentials at scale from text files with built-in prefix caching and `tqdm` progress tracking.
+- **Rate Limit & Retry Protection:** Respects HIBP rate limits (1.5-second inter-request delay on cache miss) and exponential backoff retries (1s, 2s, 4s).
+- **Report Export (`--export`):** Save structured audit reports to JSON (`.json`) or CSV (`.csv`) with automatic security warning prompts.
+
+---
+
+## 📸 Screenshots
+
+*(Place screenshots inside the `/screenshots` directory)*
+
+| Extension Popup (Option A Dark Theme) | Breach Detection & Warning |
+| :---: | :---: |
+| ![Extension Main View](screenshots/extension_popup.png) | ![Breach Warning View](screenshots/extension_breach.png) |
+
+| Intelligent Password Mutator | Python CLI Bulk Audit |
+| :---: | :---: |
+| ![Password Mutator View](screenshots/extension_mutator.png) | ![CLI Bulk Audit View](screenshots/cli_bulk.png) |
+
+---
+
+## 🚀 Quick Start & Installation
+
+### Option A: Installing the Browser Extension (Chrome / Brave / Edge)
+
+1. Clone or download this repository:
    ```bash
-   git clone [https://github.com/ditikrushnaroutray/HashGuard.git](https://github.com/ditikrushnaroutray/HashGuard.git)
+   git clone https://github.com/ditikrushnaroutray/HashGuard.git
+   ```
+2. Open your browser's Extensions page:
+   - **Brave:** `brave://extensions`
+   - **Chrome:** `chrome://extensions`
+   - **Edge:** `edge://extensions`
+3. Enable **Developer mode** in the top right corner.
+4. Click **Load unpacked** and select the `/extension` subfolder inside the HashGuard repository.
+
+---
+
+### Option B: Setting Up the Python CLI
+
+1. Ensure Python 3.8+ is installed on your system.
+2. Clone the repository and navigate to the project root:
+   ```bash
+   git clone https://github.com/ditikrushnaroutray/HashGuard.git
+   cd HashGuard
+   ```
+3. Install required dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+---
+
+## 💡 Usage Examples
+
+### 1. Interactive CLI Mode
+Launch the interactive terminal session:
+```bash
+python main.py
+```
+*Type passwords to inspect their breach status and strength. Type `exit` or press `Ctrl+C` to quit.*
+
+### 2. Enterprise Bulk Audit CLI Mode
+Audit a text file containing one password per line:
+```bash
+python main.py --bulk test_passwords.txt
+```
+
+### 3. Bulk Audit with JSON/CSV Export
+Export detailed audit metrics to structured files:
+```bash
+# Export to JSON
+python main.py --bulk passwords.txt --export audit_report.json
+
+# Export to CSV
+python main.py --bulk passwords.txt --export audit_report.csv
+```
+
+### 4. Quiet Mode (CI/CD Pipelines)
+Suppress stdout progress output and generate summary metrics only:
+```bash
+python main.py --bulk passwords.txt --export report.json --quiet
+```
+
+---
+
+## 📂 Project Structure
+
+```
+HashGuard/
+├── extension/                   # Manifest V3 Browser Extension
+│   ├── manifest.json            # Extension configuration & service worker registration
+│   ├── popup.html               # Main extension popup interface
+│   ├── popup.css                # "The Security Suite" Design System (Option A)
+│   ├── popup.js                 # Local hashing, HIBP lookup, zxcvbn integration & mutator
+│   ├── background.js            # Service worker & context menu event listener
+│   └── libs/
+│       └── zxcvbn.js            # Bundled local zero-knowledge entropy library
+├── screenshots/                 # Screenshots for documentation
+├── main.py                      # Python CLI (Interactive & Bulk Audit tool)
+├── requirements.txt             # CLI Python dependencies
+├── test_passwords.txt           # Test sample file for bulk auditing
+└── README.md                    # Project documentation
+```
+
+---
+
+## 📊 Sample Audit Output (CLI Report Format)
+
+When exporting JSON reports using `--export`, HashGuard outputs structured data:
+
+```json
+[
+  {
+    "password": "password123",
+    "breach_count": 2266543,
+    "is_breached": true,
+    "entropy_score": 2,
+    "crack_time": "15 days"
+  },
+  {
+    "password": "P@ssw0rd2026!",
+    "breach_count": 0,
+    "is_breached": false,
+    "entropy_score": 2,
+    "crack_time": "14,185,854 years"
+  }
+]
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE) - see the LICENSE file for details.
+
+---
+
+## 👤 Author & Maintainer
+
+**Ditikrushna Routray**
+- GitHub: [@ditikrushnaroutray](https://github.com/ditikrushnaroutray)
+- Repository: [https://github.com/ditikrushnaroutray/HashGuard](https://github.com/ditikrushnaroutray/HashGuard)
