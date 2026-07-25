@@ -157,6 +157,37 @@ When exporting JSON reports using `--export`, HashGuard outputs structured data:
 
 ---
 
+## 🚀 Roadmap / Future Development
+
+HashGuard Sentinel is fully functional, but great software is never truly finished. Here are the planned directions for future development. If you are interested in contributing or picking up one of these tasks, feel free to open an issue or submit a pull request!
+
+### 1. Web Scraper & Content Change Monitor (CLI)
+- **Goal:** Build a lightweight CLI utility that monitors target web resources (e.g., security advisories, vulnerability feeds, product pages, or job boards) and logs diffs or triggers desktop notifications upon content updates.
+- **Why it fits:** Expands HashGuard's terminal ecosystem into a comprehensive security & monitoring suite.
+- **Tech Stack:** Python, `requests`, `BeautifulSoup`, `difflib`.
+
+### 2. Local File Encryption Utility (AES-256-GCM)
+- **Goal:** Extend the Python CLI with an `encrypt` subcommand (e.g., `python main.py encrypt <file>`) to secure local files using master-passphrase derived keys via military-grade AES-256-GCM encryption.
+- **Why it fits:** Complements password auditing by allowing users to securely store password manager backups, private keys, or recovery codes.
+- **Tech Stack:** Python, `cryptography` (PyCA), `argparse`.
+
+### 3. Terminal User Interface (TUI Dashboard)
+- **Goal:** Build a rich interactive Terminal UI for HashGuard. Users can launch `python main.py ui` to view live breach telemetry, real-time entropy scoring, and historical checks in a terminal dashboard.
+- **Why it fits:** Significantly enhances developer UX and power-user terminal workflows.
+- **Tech Stack:** Python, `Textual`, `Rich`.
+
+### 4. REST API Microservice Backend (FastAPI)
+- **Goal:** Develop a high-performance FastAPI backend exposing HashGuard's entropy scoring and zero-knowledge breach evaluation via REST API endpoints for integration into enterprise applications or CI/CD pipelines.
+- **Why it fits:** Converts HashGuard from a client utility into a scalable microservice platform.
+- **Tech Stack:** Python, `FastAPI`, `Uvicorn`, `Pydantic`.
+
+### 5. Chrome Web Store & Browser Marketplace Deployment
+- **Goal:** Package the Manifest V3 browser extension, prepare promotional branding assets, and publish HashGuard to the official Chrome Web Store and Edge/Brave Add-on stores.
+- **Why it fits:** Makes zero-knowledge breach checking accessible to millions of everyday web users.
+- **Tech Stack:** Chrome Developer Dashboard, Web Store API, Manifest V3.
+
+---
+
 ## 📄 License
 
 This project is licensed under the [MIT License](LICENSE) - see the LICENSE file for details.
